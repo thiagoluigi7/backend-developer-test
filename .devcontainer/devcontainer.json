@@ -31,7 +31,8 @@
         "mikestead.dotenv",
         "Orta.vscode-jest",
         "prisma.prisma",
-        "yoavbls.pretty-ts-errors"
+        "yoavbls.pretty-ts-errors",
+        "mhutchie.git-graph"
       ]
     }
   }

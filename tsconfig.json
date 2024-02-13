@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    "lib": ["es2017"],
-    "module": "esnext",
+    "target": "ES2022",
+    // "lib": ["es2017"],
+    "module": "ES2022",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "removeComments": true,
@@ -19,7 +20,6 @@
     "allowUnreachableCode": false,
     "noFallthroughCasesInSwitch": true,
 
-    "target": "es2017",
     "outDir": "dist",
     "declaration": true,
     "sourceMap": true,

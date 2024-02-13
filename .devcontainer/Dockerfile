@@ -3,6 +3,7 @@ FROM mcr.microsoft.com/devcontainers/typescript-node:1-20-bullseye
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "../awscliv2.zip" && unzip -d "../" "../awscliv2.zip" && sudo ../aws/install 
 
 # [Optional] Uncomment if you want to install an additional version of node using nvm
 # ARG EXTRA_NODE_VERSION=10
