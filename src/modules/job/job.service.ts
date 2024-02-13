@@ -1,5 +1,8 @@
+import 'dotenv/config';
+
 import { JobStatus, type Prisma, type PrismaClient } from '@prisma/client';
 import type { DefaultArgs } from '@prisma/client/runtime/library';
+import AWS from 'aws-sdk';
 
 export class JobService {
   databaseConnection: PrismaClient<
@@ -9,7 +12,7 @@ export class JobService {
   >;
 
   constructor(
-    prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+    prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>
   ) {
     this.databaseConnection = prisma;
   }
@@ -22,6 +25,25 @@ export class JobService {
     return this.databaseConnection.job.findFirst({
       where: {
         id,
+      },
+    });
+  }
+
+  findAllPublishedWithCompany() {
+    return this.databaseConnection.job.findMany({
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        createdAt: true,
+        company: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      where: {
+        status: JobStatus.published,
       },
     });
   }
@@ -59,5 +81,33 @@ export class JobService {
         status: JobStatus.archived,
       },
     });
+  }
+
+  static async getFeed(): Promise<
+    {
+      id: string;
+      createdAt: Date;
+      title: string;
+      description: string;
+      company: {
+        name: string;
+      };
+    }[]
+  > {
+    const s3 = new AWS.S3();
+
+    const bucket = process.env.BUCKET_NAME!;
+    const key = 'feed.json';
+
+    const params: AWS.S3.GetObjectRequest = {
+      Bucket: bucket,
+      Key: key,
+    };
+
+    const feed = JSON.parse(
+      ((await s3.getObject(params).promise()).Body as string) ?? ''
+    );
+
+    return feed;
   }
 }

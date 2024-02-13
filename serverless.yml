@@ -1,5 +1,31 @@
 service: backend-developer-test
 
+provider:
+  name: aws
+  stage: ${self:custom.stage}
+  region: ${self:custom.region}
+  runtime: nodejs20.x
+  memorySize: 512
+  timeout: 10
+  logRetentionInDays: 90
+  logs:
+    httpApi: true
+  httpApi:
+    # metrics: true # Enable if you need
+    cors: true
+
+package:
+  patterns:
+    - '!**/*.test.ts'
+    - ${self:custom.prismaEngine.${self:custom.stage}}
+    - 'node_modules/.prisma/client/schema.prisma'
+  individually: true
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-esbuild
+  - serverless-offline
+
 custom:
   # Our stage is based on what is passed in when running serverless
   # commands. Or falls back to what we have set in the provider section.
@@ -7,12 +33,12 @@ custom:
   region: ${opt:region, 'us-east-1'}
 
   prismaEngine:
-    offline: "node_modules/.prisma/client/*.node"
-    staging: "node_modules/.prisma/client/libquery_engine-rhel*"
-    prod: "node_modules/.prisma/client/libquery_engine-rhel*"
+    offline: 'node_modules/.prisma/client/*.node'
+    staging: 'node_modules/.prisma/client/libquery_engine-rhel*'
+    prod: 'node_modules/.prisma/client/libquery_engine-rhel*'
 
   esbuild:
-    platform: "node"
+    platform: 'node'
     target: node16
     sourcemap: linked
     format: esm
@@ -24,37 +50,39 @@ custom:
     noPrependStageInUrl: true
     reloadHandler: true
 
-provider:
-  name: aws
-  stage: ${self:custom.stage}
-  region: ${self:custom.region}
-  runtime: nodejs16.x
-  memorySize: 512
-  timeout: 10
-  logRetentionInDays: 90
-  logs:
-    httpApi: true
-  httpApi:
-    # metrics: true # Enable if you need
-    cors: true
+resources:
+  Resources:
+    FeedBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: feedbucket-${self:custom.stage}
+        AccessControl: Private
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - HEAD
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
 
 functions:
   app:
-    handler: src/functions/handler.handler
+    handler: src/functions/app.handler
     # reservedConcurrency: 100
     events:
       - httpApi:
-          path: "/{proxy+}"
-          method: "*"
+          path: '/{proxy+}'
+          method: '*'
 
-package:
-  patterns:
-    - "!**/*.test.ts"
-    - ${self:custom.prismaEngine.${self:custom.stage}}
-    - "node_modules/.prisma/client/schema.prisma"
-  individually: true
-
-plugins:
-  - serverless-dotenv-plugin
-  - serverless-esbuild
-  - serverless-offline
+  feedUpdater:
+    handler: src/functions/feed-updater.handler
+    events:
+      - httpApi: # For debugging purposes
+          path: '/feed'
+          method: post
+      - eventBridge:
+          schedule: cron(0 */3 * * ? *)

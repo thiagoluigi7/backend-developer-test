@@ -66,8 +66,8 @@ app.put('/job/:id/archive', async (req, res) => {
   res.json({ job });
 });
 
-app.get('/job', async (_, res) => {
-  const jobs = await jobService.findAll();
+app.get('/feed', async (_, res) => {
+  const jobs = JobService.getFeed();
 
   res.json({ jobs });
 });
