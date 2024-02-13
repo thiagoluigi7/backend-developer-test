@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "mikestead.dotenv",
+    "Orta.vscode-jest",
+    "prisma.prisma",
+    "yoavbls.pretty-ts-errors",
+    "amazonwebservices.aws-toolkit-vscode",
+    "threadheap.serverless-ide-vscode"
+  ]
+}
