@@ -67,9 +67,9 @@ app.put('/job/:id/archive', async (req, res) => {
 });
 
 app.get('/feed', async (_, res) => {
-  const jobs = JobService.getFeed();
+  const feed = await JobService.getFeed();
 
-  res.json({ jobs });
+  res.json({ jobs: feed });
 });
 
 app.use((_, res, _2) => {
