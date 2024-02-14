@@ -14,6 +14,15 @@ provider:
     # metrics: true # Enable if you need
     cors: true
 
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 's3:*'
+      Resource:
+        Fn::GetAtt:
+          - FeedBucket
+          - Arn
+
 package:
   patterns:
     - '!**/*.test.ts'
@@ -39,9 +48,10 @@ custom:
 
   esbuild:
     platform: 'node'
-    target: node16
+    target: ES2022
     sourcemap: linked
     format: esm
+    outputFileExtension: .mjs
     banner: # Used because serverless-esbuild does not support ESM/ES Modules https://github.com/floydspace/serverless-esbuild/issues/483#issuecomment-1718837093
       js: import { createRequire } from 'module';const require = (await import('node:module')).createRequire(import.meta.url);const __filename = (await import('node:url')).fileURLToPath(import.meta.url);const __dirname = (await import('node:path')).dirname(__filename);
 
@@ -72,7 +82,6 @@ resources:
 functions:
   app:
     handler: src/functions/app.handler
-    # reservedConcurrency: 100
     events:
       - httpApi:
           path: '/{proxy+}'
