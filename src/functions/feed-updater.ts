@@ -1,14 +1,24 @@
 import 'dotenv/config';
 
+import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
+import { S3 } from '@aws-sdk/client-s3';
 import { PrismaClient } from '@prisma/client';
-import type { Handler } from 'aws-lambda';
-import AWS from 'aws-sdk';
-import type { PutObjectRequest } from 'aws-sdk/clients/s3';
+import type {
+  APIGatewayProxyEventV2,
+  APIGatewayProxyStructuredResultV2,
+  Context,
+  Handler,
+} from 'aws-lambda';
 
 import { JobService } from '@/modules/job/job.service';
 
-export const handler: Handler = async (_, _2) => {
-  const s3 = new AWS.S3();
+const FILE_KEY = 'feed.json';
+
+export const handler: Handler = async (
+  _event: APIGatewayProxyEventV2,
+  _context: Context
+): Promise<APIGatewayProxyStructuredResultV2> => {
+  const s3 = new S3();
   const prisma = new PrismaClient();
   const jobService = new JobService(prisma);
 
@@ -18,13 +28,13 @@ export const handler: Handler = async (_, _2) => {
 
   const body = JSON.stringify(jobs);
 
-  const object: PutObjectRequest = {
+  const object: PutObjectCommandInput = {
     Bucket: bucket,
-    Key: 'feed.json',
+    Key: FILE_KEY,
     Body: body,
   };
 
-  await s3.putObject(object).promise();
+  await s3.putObject(object);
 
   return {
     statusCode: 200,

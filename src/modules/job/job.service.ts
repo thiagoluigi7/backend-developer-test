@@ -1,8 +1,9 @@
 import 'dotenv/config';
 
+import type { GetObjectCommandInput } from '@aws-sdk/client-s3';
+import { S3 } from '@aws-sdk/client-s3';
 import { JobStatus, type Prisma, type PrismaClient } from '@prisma/client';
 import type { DefaultArgs } from '@prisma/client/runtime/library';
-import AWS from 'aws-sdk';
 
 export class JobService {
   databaseConnection: PrismaClient<
@@ -94,19 +95,19 @@ export class JobService {
       };
     }[]
   > {
-    const s3 = new AWS.S3();
+    const s3 = new S3();
 
     const bucket = process.env.BUCKET_NAME!;
     const key = 'feed.json';
 
-    const params: AWS.S3.GetObjectRequest = {
+    const params: GetObjectCommandInput = {
       Bucket: bucket,
       Key: key,
     };
 
-    const feed = JSON.parse(
-      ((await s3.getObject(params).promise()).Body as string) ?? ''
-    );
+    const s3Body = (await s3.getObject(params)).Body;
+    const s3BodyString = await s3Body?.transformToString();
+    const feed = JSON.parse(s3BodyString ?? '');
 
     return feed;
   }
