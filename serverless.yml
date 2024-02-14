@@ -19,9 +19,8 @@ provider:
       Action:
         - 's3:*'
       Resource:
-        Fn::GetAtt:
-          - FeedBucket
-          - Arn
+        - 'arn:aws:s3:::feedbucket-${self:custom.stage}/*'
+        - 'arn:aws:s3:::feedbucket-${self:custom.stage}'
 
 package:
   patterns:
