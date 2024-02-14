@@ -98,7 +98,7 @@ export class JobService {
     const s3 = new S3();
 
     const bucket = process.env.BUCKET_NAME!;
-    const key = 'feed.json';
+    const key = process.env.FILE_KEY!;
 
     const params: GetObjectCommandInput = {
       Bucket: bucket,

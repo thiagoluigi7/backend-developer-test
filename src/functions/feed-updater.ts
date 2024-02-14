@@ -12,8 +12,6 @@ import type {
 
 import { JobService } from '@/modules/job/job.service';
 
-const FILE_KEY = 'feed.json';
-
 export const handler: Handler = async (
   _event: APIGatewayProxyEventV2,
   _context: Context
@@ -23,6 +21,7 @@ export const handler: Handler = async (
   const jobService = new JobService(prisma);
 
   const bucket = process.env.BUCKET_NAME!;
+  const key = process.env.FILE_KEY!;
 
   const jobs = await jobService.findAllPublishedWithCompany();
 
@@ -30,7 +29,7 @@ export const handler: Handler = async (
 
   const object: PutObjectCommandInput = {
     Bucket: bucket,
-    Key: FILE_KEY,
+    Key: key,
     Body: body,
   };
 
