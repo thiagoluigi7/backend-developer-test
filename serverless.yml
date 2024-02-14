@@ -33,6 +33,7 @@ plugins:
   - serverless-dotenv-plugin
   - serverless-esbuild
   - serverless-offline
+  - serverless-lift
 
 custom:
   # Our stage is based on what is passed in when running serverless
@@ -78,9 +79,18 @@ resources:
               AllowedHeaders:
                 - '*'
 
+constructs:
+  moderation-queue:
+    type: queue
+    maxRetries: 1
+    worker:
+      handler: src/functions/moderation-check.handler
+
 functions:
   app:
     handler: src/functions/app.handler
+    environment:
+      QUEUE_URL: ${construct:moderation-queue.queueUrl}
     events:
       - httpApi:
           path: '/{proxy+}'
@@ -93,4 +103,4 @@ functions:
           path: '/feed'
           method: post
       - eventBridge:
-          schedule: cron(0 */3 * * ? *)
+          schedule: cron(0 */6 * * ? *)

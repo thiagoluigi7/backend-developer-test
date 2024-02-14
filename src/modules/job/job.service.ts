@@ -2,6 +2,7 @@ import 'dotenv/config';
 
 import type { GetObjectCommandInput } from '@aws-sdk/client-s3';
 import { S3 } from '@aws-sdk/client-s3';
+import { SQS } from '@aws-sdk/client-sqs';
 import { JobStatus, type Prisma, type PrismaClient } from '@prisma/client';
 import type { DefaultArgs } from '@prisma/client/runtime/library';
 
@@ -53,14 +54,14 @@ export class JobService {
     return this.databaseConnection.job.create({ data: createJob });
   }
 
-  publishJobDraft(id: string) {
-    return this.databaseConnection.job.update({
-      where: {
-        id,
-      },
-      data: {
-        status: JobStatus.published,
-      },
+  async publishJobDraft(id: string) {
+    const sqs = new SQS();
+
+    const job = await this.databaseConnection.job.findFirst({ where: { id } });
+
+    await sqs.sendMessage({
+      QueueUrl: process.env.QUEUE_URL,
+      MessageBody: JSON.stringify(job),
     });
   }
 

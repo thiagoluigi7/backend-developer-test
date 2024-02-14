@@ -43,9 +43,9 @@ app.post('/job', async (req, res) => {
 });
 
 app.put('/job/:id/publish', async (req, res) => {
-  const job = await jobService.publishJobDraft(req.params.id);
+  await jobService.publishJobDraft(req.params.id);
 
-  res.json({ job });
+  res.json({ status: 'success' });
 });
 
 app.put('/job/:id', async (req, res) => {
