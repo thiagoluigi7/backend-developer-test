@@ -82,7 +82,6 @@ resources:
 constructs:
   moderation-queue:
     type: queue
-    fifo: true
     maxRetries: 1
     worker:
       handler: src/functions/moderation-check.handler
