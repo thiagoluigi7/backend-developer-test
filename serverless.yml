@@ -90,8 +90,6 @@ constructs:
 functions:
   app:
     handler: src/functions/app.handler
-    environment:
-      QUEUE_URL: ${construct:moderation-queue.queueUrl}
     events:
       - httpApi:
           path: '/{proxy+}'
