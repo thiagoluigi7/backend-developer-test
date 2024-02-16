@@ -37,6 +37,7 @@ const config: JestConfigWithTsJest = {
     '<rootDir>/.serverless/',
     './dist',
   ],
+  setupFilesAfterEnv: ['<rootDir>/src/jest-singleton.ts'],
 };
 
 export default config;
