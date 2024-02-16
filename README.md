@@ -29,6 +29,28 @@ This last command will delete all previous build of the project and then build i
 
 The `PUT /job/:job_id/publish` endpoint uses a SQS Queue and the queue will start another lambda. So to better see this endpoint in action it is advised to deploy this project to AWS to test it fully. 
 
+The body of the `POST /job` is like this
+```
+{
+  title: string,
+  description: string,
+  location: string,
+  notes?: string, 
+  companyId: string
+}
+```
+
+The body of the `PUT /job` is like this
+```
+{
+  title?: string,
+  description?: string,
+  location?: string,
+  notes?: string, 
+  companyId?: string
+}
+```
+
 ### Remotely
 
 I've deployed this project to my personal AWS account as well to test and I will leave it online for some time. So it is possible to make requests to it online as well. To do that you can use this endpoint `https://2m9bqd3oo3.execute-api.us-east-1.amazonaws.com/` as an entry point. So if you want to make the `GET /companies` you can make a GET request to `https://2m9bqd3oo3.execute-api.us-east-1.amazonaws.com/companies`.
