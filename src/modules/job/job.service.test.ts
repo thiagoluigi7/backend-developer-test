@@ -41,7 +41,40 @@ test('should create a new job', async () => {
   });
 });
 
-test('should publish a job draft', async () => {});
+test('should update a job description', async () => {
+  const id = randomUUID();
+  const createdAt = new Date();
+  const updatedAt = new Date();
+  const companyId = randomUUID();
+
+  const service = new JobService(prisma);
+
+  const job = {
+    id,
+    createdAt,
+    updatedAt,
+    title: 'Test',
+    description: 'This is a job update test',
+    location: 'Remote',
+    status: JobStatus.draft,
+    notes: null,
+    companyId,
+  };
+
+  prismaMock.job.update.mockResolvedValue(job);
+
+  await expect(service.editJobDraft(id, job)).resolves.toEqual({
+    id,
+    createdAt,
+    updatedAt,
+    title: 'Test',
+    description: 'This is a job update test',
+    location: 'Remote',
+    status: JobStatus.draft,
+    notes: null,
+    companyId,
+  });
+});
 
 test('should archive a job', async () => {
   const id = randomUUID();
