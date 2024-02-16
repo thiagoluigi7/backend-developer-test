@@ -36,6 +36,12 @@ app.get('/companies/:id', async (req, res) => {
   res.json({ company });
 });
 
+app.get('/job', async (_req, res) => {
+  const jobs = await jobService.findAll();
+
+  res.json({ jobs });
+});
+
 app.post('/job', async (req, res) => {
   const job = await jobService.createJobDraft(req.body);
 
