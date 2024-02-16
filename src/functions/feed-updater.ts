@@ -23,6 +23,10 @@ export const handler: Handler = async (
   const bucket = process.env.BUCKET_NAME!;
   const key = process.env.FILE_KEY!;
 
+  console.log(
+    'Getting all published jobs with its respective company information.'
+  );
+
   const jobs = await jobService.findAllPublishedWithCompany();
 
   const body = JSON.stringify(jobs);
@@ -33,7 +37,11 @@ export const handler: Handler = async (
     Body: body,
   };
 
+  console.log('Saving job information on S3.');
+
   await s3.putObject(object);
+
+  console.log('Operation finalized with success.');
 
   return {
     statusCode: 200,
