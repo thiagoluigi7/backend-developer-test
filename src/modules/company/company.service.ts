@@ -9,7 +9,7 @@ export class CompanyService {
   >;
 
   constructor(
-    prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+    prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>
   ) {
     this.databaseConnection = prisma;
   }
