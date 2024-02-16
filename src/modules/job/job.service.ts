@@ -51,10 +51,14 @@ export class JobService {
   }
 
   createJobDraft(createJob: Prisma.JobCreateInput) {
+    if (!createJob) throw new Error('No body received.');
+
     return this.databaseConnection.job.create({ data: createJob });
   }
 
   async publishJobDraft(id: string) {
+    if (!id) throw new Error('No id informed.');
+
     const sqs = new SQS();
 
     const job = await this.databaseConnection.job.findFirst({ where: { id } });
@@ -66,6 +70,8 @@ export class JobService {
   }
 
   editJobDraft(id: string, editJob: Prisma.JobUpdateInput) {
+    if (!id) throw new Error('No id informed.');
+
     return this.databaseConnection.job.update({
       where: { id },
       data: editJob,
@@ -73,10 +79,14 @@ export class JobService {
   }
 
   deleteJobDraft(id: string) {
+    if (!id) throw new Error('No id informed.');
+
     return this.databaseConnection.job.delete({ where: { id } });
   }
 
   archiveJob(id: string) {
+    if (!id) throw new Error('No id informed.');
+
     return this.databaseConnection.job.update({
       where: { id },
       data: {
