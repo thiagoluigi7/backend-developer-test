@@ -1,5 +1,73 @@
 # Backend Developer Technical Assessment
 
+## Steps to run this project:
+
+### Locally
+
+- Setup the environment
+- Setup the project
+
+#### Setup the environment
+
+This project has a devcontainer with a docker environment configured with two containers one with the postgreSQL database and another one with the Node 20 runtime. If you have docker installed on your machine and the devcontainer extension on your VSCode it will give you the option to open the project on the container and when you open it up it will configure the environment and the VSCode for you.
+
+If you prefer to run locally you will need to install Node 20. If you are using NVM you can use the command `nvm use`.
+
+With the environment configured you can proceed to setup the project.
+
+#### Setup the project
+
+1. Run `npm ci` command. If it does not work use the `npm install` command.
+2. Run `npx prisma generate` command
+3. Create a `.env.development` file at the root of the project and setup the environment variables. You can use the `.env.example` file to see what they are.
+4. Run `npm run dev` command.
+
+This last command will delete all previous build of the project and then build it again and start the main lambda offline. This will simulate a AWS Api Gateway and a Lambda execution when you make a request to `localhost:4000/`. So if you want to make the `GET /companies` you can make a GET request to `localhost:4000/companies`.
+
+### Remotely
+
+I've deployed this project to my personal AWS account as well to test and I will leave it online for some time. So it is possible to make requests to it online as well. To do that you can use this endpoint `https://2m9bqd3oo3.execute-api.us-east-1.amazonaws.com/` as an entry point. So if you want to make the `GET /companies` you can make a GET request to `https://2m9bqd3oo3.execute-api.us-east-1.amazonaws.com/companies`.
+
+I will not share the connection string to the database so I have done the following endpoint that is not part of the challenge just to bring everything on the `jobs` table. Just make a GET request to `https://2m9bqd3oo3.execute-api.us-east-1.amazonaws.com/job`. This way is possible to see the rejected jobs as well as the notes from the OpenAI Moderation API.
+
+## Bonus Questions
+
+1. Discuss scalability solutions for the job moderation feature under high load conditions. Consider that over time the system usage grows significantly, to the point where we will have thousands of jobs published every hour. Consider the API will be able to handle the requests, but the serverless component will be overwhelmed with requests to moderate the jobs. This will affect the database connections and calls to the OpenAI API. How would you handle those issues and what solutions would you implement to mitigate the issues?
+<br>
+The moderation lambda is invoked by a SQS queue. So to deal with this scenario I would fine tune the queue. The queue is already programmed to be a FIFO queue. This by itself have [content-based deduplication](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues-exactly-once-processing.html). I would also find the best batch size. With this one lambda can deal with a lot of requests and they would share the same connection pool. The handler was programmed to execute asynchronously every message of the batch. This way the handler code does not need to be touched. The amount of concurrent handlers also need to be taken into consideration. With these fine tunning the system will be a lot more resilient.
+<br>
+
+2. Propose a strategy for delivering the job feed globally with sub-millisecond latency. Consider now that we need to provide a low latency endpoint that can serve the job feed content worldwide. Using AWS as a cloud provider, what technologies would you need to use to implement this feature and how would you do it?
+<br>
+If the normal S3 is not fast enough I would first try to make a [Multi-Region Access Points in Amazon S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/MultiRegionAccessPoints.html). With this the content would be replicated across the globe and stored in datacenters near the client who made the request. If this is still not enough maybe this is an [Edge](https://aws.amazon.com/pt/edge/services/) case (haha pun intended). This edge services of AWS like [AWS Storage Gateway](https://aws.amazon.com/pt/storagegateway/) or [AWS CloudFront](https://aws.amazon.com/pt/cloudfront/) may be what is needed to resolve this sub-millisecond latency problem to delivery the feed globally.
+<br>
+
+
+## Notes
+
+> If you have any doubt you can send me an email: thiagoluigi7@hotmail.com
+
+### Extra endpoints
+
+I have implemented two endpoints that are not part of the challenge:
+
+- `GET /job`
+- `POST /feed`
+
+#### `GET /job`
+
+I have done it to show the database entries in case you want to check the solution that I have already deployed to my AWS Account. So with this endpoint is possible to have all the entries on the jobs table. Because a connection string to the database will not be provided.
+
+#### `POST /feed`
+
+This one I have done to invoke the lambda function that updates the feed.json file on the S3 bucket. It is simply for debugging purposes because I did not want to wait for the timely invocations. It can also be used to update the feed.json on demand.
+
+### DDL
+
+The `notes` column of the `jobs` table would be better if it was a `JSONB` column instead of just text. With a JSONB column it would be possible to better store the return of the OpenAI API. And it would be better to query it as well.
+
+----
+
 ## Welcome!
 
 We're excited to have you participate in our Backend Developer technical assessment. This test is designed to gauge your expertise in backend development, with a focus on architectural and organizational skills. Below, you'll find comprehensive instructions to set up and complete the project. Remember, completing every step is not mandatory; some are optional but can enhance your application.
