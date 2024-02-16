@@ -59,15 +59,15 @@ I will not share the connection string to the database so I have done the follow
 
 ## Bonus Questions
 
-1. Discuss scalability solutions for the job moderation feature under high load conditions. Consider that over time the system usage grows significantly, to the point where we will have thousands of jobs published every hour. Consider the API will be able to handle the requests, but the serverless component will be overwhelmed with requests to moderate the jobs. This will affect the database connections and calls to the OpenAI API. How would you handle those issues and what solutions would you implement to mitigate the issues?
-<br>
-The moderation lambda is invoked by a SQS queue. So to deal with this scenario I would fine tune the queue. The queue could be updated to be a FIFO queue. This by itself would have [content-based deduplication](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues-exactly-once-processing.html). I would also find the best batch size. With this one lambda can deal with a lot of requests and they would share the same connection pool. The handler was programmed to execute asynchronously every message of the batch. This way the handler code does not need to be touched. The amount of concurrent handlers also need to be taken into consideration. With these fine tunning the system will be a lot more resilient.
-<br><br>
+1. Discuss scalability solutions for the job moderation feature under high load conditions. Consider that over time the system usage grows significantly, to the point where we will have thousands of jobs published every hour. Consider the API will be able to handle the requests, but the serverless component will be overwhelmed with requests to moderate the jobs. This will affect the database connections and calls to the OpenAI API. How would you handle those issues and what solutions would you implement to mitigate the issues?  
 
-2. Propose a strategy for delivering the job feed globally with sub-millisecond latency. Consider now that we need to provide a low latency endpoint that can serve the job feed content worldwide. Using AWS as a cloud provider, what technologies would you need to use to implement this feature and how would you do it?
-<br>
-If the normal S3 is not fast enough I would first try to make a [Multi-Region Access Points in Amazon S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/MultiRegionAccessPoints.html). With this the content would be replicated across the globe and stored in datacenters near the client who made the request. If this is still not enough maybe this is an [Edge](https://aws.amazon.com/pt/edge/services/) case (haha pun intended). This edge services of AWS like [AWS Storage Gateway](https://aws.amazon.com/pt/storagegateway/) or [AWS CloudFront](https://aws.amazon.com/pt/cloudfront/) may be what is needed to resolve this sub-millisecond latency problem to delivery the feed globally.
-<br>
+The moderation lambda is invoked by a SQS queue. So to deal with this scenario I would fine tune the queue. The queue could be updated to be a FIFO queue. This by itself would have [content-based deduplication](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues-exactly-once-processing.html) . I would also find the best batch size. With this one lambda can deal with a lot of requests and they would share the same connection pool. The handler was programmed to execute asynchronously every message of the batch. This way the handler code does not need to be touched. The amount of concurrent handlers also need to be taken into consideration. With these fine tunning the system will be a lot more resilient.  
+
+
+2. Propose a strategy for delivering the job feed globally with sub-millisecond latency. Consider now that we need to provide a low latency endpoint that can serve the job feed content worldwide. Using AWS as a cloud provider, what technologies would you need to use to implement this feature and how would you do it?  
+
+If the normal S3 is not fast enough I would first try to make a [Multi-Region Access Points in Amazon S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/MultiRegionAccessPoints.html). With this the content would be replicated across the globe and stored in datacenters near the client who made the request. If this is still not enough maybe this is an [Edge](https://aws.amazon.com/pt/edge/services/) case (haha pun intended). This edge services of AWS like [AWS Storage Gateway](https://aws.amazon.com/pt/storagegateway/) or [AWS CloudFront](https://aws.amazon.com/pt/cloudfront/) may be what is needed to resolve this sub-millisecond latency problem to delivery the feed globally.  
+
 
 
 ## Notes
