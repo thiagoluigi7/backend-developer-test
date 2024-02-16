@@ -1,18 +1,16 @@
 import 'express-async-errors';
 
-import { PrismaClient } from '@prisma/client';
 import express, { json } from 'express';
 import helmet from 'helmet';
 
 import { CompanyController } from './modules/company/company.controller';
 import { JobController } from './modules/job/job.controller';
 import { JobService } from './modules/job/job.service';
+import prisma from './prisma-client';
 
 const app = express();
 app.use(json());
 app.use(helmet());
-
-const prisma = new PrismaClient();
 
 const companyController = new CompanyController(prisma);
 const jobController = new JobController(prisma);
