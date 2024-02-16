@@ -71,6 +71,10 @@ This one I have done to invoke the lambda function that updates the feed.json fi
 
 The `notes` column of the `jobs` table would be better if it was a `JSONB` column instead of just text. With a JSONB column it would be possible to better store the return of the OpenAI API. And it would be better to query it as well.
 
+### Running the express application
+
+This project was designed with its execution happening on a lambda. So it is not possible to start just the express application and make request directly to it without simulating a lambda + gateway. 
+
 ----
 
 ## Welcome!
