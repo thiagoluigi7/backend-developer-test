@@ -6,6 +6,7 @@
 
 - Setup the environment
 - Setup the project
+- Notes
 
 #### Setup the environment
 
@@ -24,6 +25,10 @@ With the environment configured you can proceed to setup the project.
 
 This last command will delete all previous build of the project and then build it again and start the main lambda offline. This will simulate a AWS Api Gateway and a Lambda execution when you make a request to `localhost:4000/`. So if you want to make the `GET /companies` you can make a GET request to `localhost:4000/companies`.
 
+#### Notes
+
+The `PUT /job/:job_id/publish` endpoint uses a SQS Queue and the queue will start another lambda. So to better see this endpoint in action it is advised to deploy this project to AWS to test it fully. 
+
 ### Remotely
 
 I've deployed this project to my personal AWS account as well to test and I will leave it online for some time. So it is possible to make requests to it online as well. To do that you can use this endpoint `https://2m9bqd3oo3.execute-api.us-east-1.amazonaws.com/` as an entry point. So if you want to make the `GET /companies` you can make a GET request to `https://2m9bqd3oo3.execute-api.us-east-1.amazonaws.com/companies`.
@@ -34,7 +39,7 @@ I will not share the connection string to the database so I have done the follow
 
 1. Discuss scalability solutions for the job moderation feature under high load conditions. Consider that over time the system usage grows significantly, to the point where we will have thousands of jobs published every hour. Consider the API will be able to handle the requests, but the serverless component will be overwhelmed with requests to moderate the jobs. This will affect the database connections and calls to the OpenAI API. How would you handle those issues and what solutions would you implement to mitigate the issues?
 <br>
-The moderation lambda is invoked by a SQS queue. So to deal with this scenario I would fine tune the queue. The queue is already programmed to be a FIFO queue. This by itself have [content-based deduplication](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues-exactly-once-processing.html). I would also find the best batch size. With this one lambda can deal with a lot of requests and they would share the same connection pool. The handler was programmed to execute asynchronously every message of the batch. This way the handler code does not need to be touched. The amount of concurrent handlers also need to be taken into consideration. With these fine tunning the system will be a lot more resilient.
+The moderation lambda is invoked by a SQS queue. So to deal with this scenario I would fine tune the queue. The queue could be updated to be a FIFO queue. This by itself would have [content-based deduplication](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues-exactly-once-processing.html). I would also find the best batch size. With this one lambda can deal with a lot of requests and they would share the same connection pool. The handler was programmed to execute asynchronously every message of the batch. This way the handler code does not need to be touched. The amount of concurrent handlers also need to be taken into consideration. With these fine tunning the system will be a lot more resilient.
 <br>
 
 2. Propose a strategy for delivering the job feed globally with sub-millisecond latency. Consider now that we need to provide a low latency endpoint that can serve the job feed content worldwide. Using AWS as a cloud provider, what technologies would you need to use to implement this feature and how would you do it?
