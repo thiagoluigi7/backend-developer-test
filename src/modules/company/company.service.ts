@@ -19,6 +19,8 @@ export class CompanyService {
   }
 
   findById(id: string) {
+    if (!id) throw new Error('No id informed.');
+
     return this.databaseConnection.company.findFirst({
       where: {
         id,

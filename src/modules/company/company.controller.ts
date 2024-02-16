@@ -18,6 +18,8 @@ export class CompanyController {
   }
 
   prepareRoutes() {
+    // GET routes
+
     this.router.get('/', async (_, res) => {
       const companies = await this.service.findAll();
 
@@ -27,9 +29,16 @@ export class CompanyController {
     });
 
     this.router.get('/:id', async (req, res) => {
-      const company = await this.service.findById(req.params.id);
+      try {
+        const company = await this.service.findById(req.params.id);
 
-      res.json({ company });
+        res.json({ company });
+      } catch (error) {
+        console.error(error);
+
+        res.statusCode = 400;
+        res.json({ message: error });
+      }
     });
 
     return this.router;
