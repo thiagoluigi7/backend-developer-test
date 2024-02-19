@@ -53,6 +53,8 @@ The body of the `PUT /job` is like this
 
 ### Remotely
 
+Update: I have removed the remote version because of the cost. I'll leave the rest of the content below just for informational purposes.
+
 I've deployed this project to my personal AWS account as well to test and I will leave it online for some time. So it is possible to make requests to it online as well. To do that you can use this endpoint `https://2m9bqd3oo3.execute-api.us-east-1.amazonaws.com/` as an entry point. So if you want to make the `GET /companies` you can make a GET request to `https://2m9bqd3oo3.execute-api.us-east-1.amazonaws.com/companies`.
 
 I will not share the connection string to the database so I have done the following endpoint that is not part of the challenge just to bring everything on the `jobs` table. Just make a GET request to `https://2m9bqd3oo3.execute-api.us-east-1.amazonaws.com/job`. This way is possible to see the rejected jobs as well as the notes from the OpenAI Moderation API.
